@@ -1,14 +1,12 @@
-const axios = require("axios");
-const User = require("../models/User");
+const axios = require('axios');
+const User = require('../models/User');
 
 const fetchAndStoreUsers = async () => {
   try {
-    const { data } = await axios.get("https://randomuser.me/api/?results=20", {
-      timeout: 5000,
-    });
+    const { data } = await axios.get('https://randomuser.me/api/?results=20');
 
     if (!data || !data.results) {
-      throw new Error("Invalid API response");
+      throw new Error('Invalid API response');
     }
 
     const users = data.results.map((user) => ({
@@ -41,7 +39,7 @@ const fetchAndStoreUsers = async () => {
       totalUsers: await User.count(),
     };
   } catch (error) {
-    console.error("Error in fetchAndStoreUsers:", {
+    console.error('Error in fetchAndStoreUsers:', {
       message: error.message,
       stack: error.stack,
       timestamp: new Date().toISOString(),

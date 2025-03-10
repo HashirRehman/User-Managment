@@ -1,30 +1,40 @@
-const { DataTypes } = require("sequelize");
-const sequelize = require("../config/db");
-const bcrypt = require("bcryptjs");
+const { DataTypes } = require('sequelize');
+const { sequelize } = require('../config/db');
+const bcrypt = require('bcryptjs');
 
-const Auth = sequelize.define("Auth", {
-  uuid: {
-    type: DataTypes.UUID,
-    defaultValue: DataTypes.UUIDV4,
-    primaryKey: true,
-  },
-  email: {
-    type: DataTypes.STRING,
-    unique: true,
-    allowNull: false,
-    validate: {
-      isEmail: true,
+const Auth = sequelize.define(
+  'Auth',
+  {
+    uuid: {
+      type: DataTypes.UUID,
+      defaultValue: DataTypes.UUIDV4,
+      primaryKey: true,
+    },
+    email: {
+      type: DataTypes.STRING,
+      unique: true,
+      allowNull: false,
+      validate: {
+        isEmail: true,
+      },
+      set(value) {
+        this.setDataValue('email', value.toLowerCase());
+      },
+    },
+    password: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    role: {
+      type: DataTypes.ENUM('admin', 'user'),
+      defaultValue: 'user',
     },
   },
-  password: {
-    type: DataTypes.STRING,
-    allowNull: false,
-  },
-  role: {
-    type: DataTypes.ENUM("admin", "user"),
-    defaultValue: "user",
-  },
-});
+  {
+    tableName: 'auth',
+    timestamps: true,
+  }
+);
 
 // Hash password before saving
 Auth.beforeCreate(async (user) => {

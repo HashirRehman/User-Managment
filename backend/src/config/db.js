@@ -1,27 +1,26 @@
-const { Sequelize } = require("sequelize");
-require("dotenv").config();
+const { Sequelize } = require('sequelize');
+const dotenv = require('dotenv');
+
+dotenv.config();
 
 const sequelize = new Sequelize(process.env.DATABASE_URL, {
-  dialect: "postgres",
-  logging: false,
+  dialect: 'postgres',
+  logging: process.env.DB_LOGGING === 'true',
   pool: {
-    max: 5,
-    min: 0,
-    acquire: 30000,
-    idle: 10000,
+    max: parseInt(process.env.DB_POOL_MAX, 10) || 5,
+    min: parseInt(process.env.DB_POOL_MIN, 10) || 0,
+    acquire: parseInt(process.env.DB_ACQUIRE, 10) || 30000,
+    idle: parseInt(process.env.DB_IDLE, 10) || 10000,
   },
 });
 
-// Test database connection
 const testConnection = async () => {
   try {
     await sequelize.authenticate();
-    console.log("Database connection established successfully.");
+    console.log('✅ Database connection established successfully.');
   } catch (error) {
-    console.error("Unable to connect to the database:", error);
+    console.error('❌ Unable to connect to the database:', error);
   }
 };
 
-testConnection();
-
-module.exports = sequelize;
+module.exports = { sequelize, testConnection };
