@@ -10,7 +10,7 @@
 </template>
 
 <script>
-import { ref, watch } from 'vue'
+import { ref, watchEffect, onUnmounted } from 'vue'
 
 export default {
   name: 'SearchBar',
@@ -21,9 +21,9 @@ export default {
     },
   },
   emits: ['update:modelValue', 'search'],
-  setup(props, { emit }) {
-    const searchInput = ref(props.modelValue)
-    let debounceTimeout
+  setup({ modelValue }, { emit }) {
+    const searchInput = ref(modelValue)
+    let debounceTimeout = null
 
     const handleInput = () => {
       emit('update:modelValue', searchInput.value)
@@ -33,12 +33,13 @@ export default {
       }, 300)
     }
 
-    watch(
-      () => props.modelValue,
-      (newValue) => {
-        searchInput.value = newValue
-      },
-    )
+    watchEffect(() => {
+      searchInput.value = modelValue
+    })
+
+    onUnmounted(() => {
+      clearTimeout(debounceTimeout)
+    })
 
     return {
       searchInput,
@@ -60,6 +61,7 @@ input {
   border: 1px solid #ddd;
   border-radius: 4px;
   font-size: 16px;
+  transition: border-color 0.2s;
 }
 
 input:focus {
